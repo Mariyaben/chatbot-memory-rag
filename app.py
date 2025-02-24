@@ -1,8 +1,8 @@
 import os
 import sys
 import pandas as pd
-import pysqlite3  # Import pysqlite3 before chromadb
-sys.modules["sqlite3"] = pysqlite3  # Override sqlite3 with pysqlite3
+import pysqlite3  
+sys.modules["sqlite3"] = pysqlite3  
 
 import chromadb
 import streamlit as st
@@ -13,13 +13,11 @@ from langchain.schema import SystemMessage
 from langchain.prompts import PromptTemplate
 
 
-# Load environment variables
 load_dotenv()
-openai_api_key = os.getenv("OPENAI_API_KEY")  # Default
+openai_api_key = os.getenv("OPENAI_API_KEY")  
 if not openai_api_key:
-    openai_api_key = st.secrets["OPENAI_API_KEY"]  # Fetch from Streamlit Secrets
+    openai_api_key = st.secrets["OPENAI_API_KEY"]  
 
-### --- STEP 1: DATA INGESTION & EMBEDDINGS STORAGE --- ###
 
 def preprocess_text(df):
     return [text for col in df.select_dtypes(include=["object"]) 
@@ -43,7 +41,6 @@ def store_embeddings_in_chroma(data_dict, model_name="all-MiniLM-L6-v2"):
                 metadatas=[{"filename": filename, "text": text_data[idx]}]
             )
 
-# Streamlit UI for file upload
 st.set_page_config(page_title="ESG Chatbot", page_icon="🌍", layout="wide")
 st.title("🌍 ESG Chatbot - AI-powered Insights")
 st.write("**Ask me anything about ESG data or upload CSV files!**")
@@ -57,7 +54,7 @@ if uploaded_files:
     store_embeddings_in_chroma(data_dict)
     st.success("Data successfully uploaded and processed!")
 
-### --- STEP 2: MEMORY-AWARE RETRIEVER --- ###
+##MEMORY-AWARE RETRIEVER
 
 chroma_client = chromadb.PersistentClient(path="chroma_db")
 collection = chroma_client.get_collection("esg_data")
@@ -77,7 +74,7 @@ def update_memory(query, response):
     
     memory_collection.add(
         ids=[f"memory_{len(memory_ids)}"],
-        embeddings=[[0] * 384],  # Placeholder embedding
+        embeddings=[[0] * 384],  
         metadatas=[{"query": query, "response": response}]
     )
 
@@ -85,7 +82,7 @@ def retrieve_memory(query):
     results = memory_collection.query(query_texts=[query], n_results=3)
     return [doc["response"] for doc in results["metadatas"][0]] if results.get("metadatas") else []
 
-### --- STEP 3: AI QUERY PROCESSING --- ###
+###AI QUERY PROCESSING 
 
 llm = ChatOpenAI(model_name="gpt-4o-mini", temperature=0.2, openai_api_key=openai_api_key)
 
@@ -119,7 +116,7 @@ def answer_query(query):
     update_memory(query, response)
     return response
 
-### --- STEP 4: CHAT INTERFACE --- ###
+
 
 if "chat_history" not in st.session_state:
     st.session_state.chat_history = []
