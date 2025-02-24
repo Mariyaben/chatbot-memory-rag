@@ -10,7 +10,9 @@ from langchain.prompts import PromptTemplate
 
 # Load environment variables
 load_dotenv()
-openai_api_key = os.getenv("OPENAI_API_KEY")
+openai_api_key = os.getenv("OPENAI_API_KEY")  # Default
+if not openai_api_key:
+    openai_api_key = st.secrets["OPENAI_API_KEY"]  # Fetch from Streamlit Secrets
 
 ### --- STEP 1: DATA INGESTION & EMBEDDINGS STORAGE --- ###
 
