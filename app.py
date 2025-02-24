@@ -1,5 +1,9 @@
 import os
+import sys
 import pandas as pd
+import pysqlite3  # Import pysqlite3 before chromadb
+sys.modules["sqlite3"] = pysqlite3  # Override sqlite3 with pysqlite3
+
 import chromadb
 import streamlit as st
 from dotenv import load_dotenv
@@ -7,6 +11,7 @@ from sentence_transformers import SentenceTransformer
 from langchain_openai import ChatOpenAI
 from langchain.schema import SystemMessage
 from langchain.prompts import PromptTemplate
+
 
 # Load environment variables
 load_dotenv()
