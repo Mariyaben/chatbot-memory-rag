@@ -12,7 +12,7 @@ def extract_zip(zip_path, extract_to="extracted_data"):
     with zipfile.ZipFile(zip_path, "r") as zip_ref:
         zip_ref.extractall(extract_to)
     
-    print(f"✅ Extracted ZIP contents to {extract_to}")
+    print(f"Extracted ZIP contents to {extract_to}")
     return extract_to
 
 def load_data(folder_path):
@@ -36,7 +36,7 @@ def store_embeddings_in_chroma(data_dict, model_name="all-MiniLM-L6-v2"):
     """Generate embeddings and store in ChromaDB."""
     client = chromadb.PersistentClient(path="chroma_db")
     collection = client.get_or_create_collection("esg_data")
-    memory_collection = client.get_or_create_collection("esg_chat_memory")  # Memory storage
+    memory_collection = client.get_or_create_collection("esg_chat_memory")  
 
     model = SentenceTransformer(model_name)
     
@@ -51,10 +51,9 @@ def store_embeddings_in_chroma(data_dict, model_name="all-MiniLM-L6-v2"):
                 metadatas=[{"filename": filename, "text": text_data[idx]}]
             )
     
-    print("✅ Embeddings stored successfully in ChromaDB!")
+    print("Embeddings stored successfully in ChromaDB!")
 
-# Run ingestion
-zip_file_path = "esg.zip"  # Change this to your ZIP file path
+zip_file_path = "esg.zip"  
 extract_folder = extract_zip(zip_file_path)
 esg_data = load_data(extract_folder)
 store_embeddings_in_chroma(esg_data)
